@@ -1,11 +1,55 @@
-import React, { useState } from "react";
-import { getFirestore } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 import useAuth from "./useAuth";
-import usePosts from "./usePosts";
 import Post from "./Post";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { submitPost, likePost, unlikePost, addComment } from "./PostActions";
+import di from "./Colorful Illustrative Young Male Avatar.png";
+
+const usePosts = (firestore) => {
+  const [posts, setPosts] = useState([]);
+  console.log(di);
+  useEffect(() => {
+    const postsCollectionRef = collection(firestore, "posts");
+    const q = query(postsCollectionRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const postsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const updatedPosts = postsData.map((post) => {
+        const commentsRef = collection(firestore, `posts/${post.id}/comments`);
+        const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
+        onSnapshot(commentsQuery, (commentsSnapshot) => {
+          const commentsData = commentsSnapshot.docs.map((commentDoc) => ({
+            id: commentDoc.id,
+            ...commentDoc.data(),
+          }));
+          post.comments = commentsData;
+          setPosts((prevPosts) => {
+            return prevPosts.map((p) => (p.id === post.id ? post : p));
+          });
+        });
+        return post;
+      });
+
+      setPosts(updatedPosts);
+    });
+
+    return () => unsubscribe();
+  }, [firestore]);
+
+  return posts;
+};
 
 const Home = () => {
   const [postContent, setPostContent] = useState("");
@@ -16,9 +60,8 @@ const Home = () => {
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (user) {
-      // Assuming user object has displayName and photoURL properties
       const username = user.displayName || "Anonymous";
-      const userPhotoURL = user.photoURL || "default-avatar-url"; // You should have a default avatar URL
+      const userPhotoURL = user.photoURL || di;
       await submitPost(
         firestore,
         user.uid,
@@ -46,9 +89,22 @@ const Home = () => {
 
   const handleCommentSubmit = (postId, commentText) => {
     if (user) {
-      addComment(firestore, postId, user.uid, commentText);
+      // Check if the user object is not null
+      const username = user.displayName || "Anonymous"; // Fallback to 'Anonymous' if no displayName
+      const userPhotoURL = user.photoURL || di; // Fallback URL if no photoURL
+
+      // Now you can pass them to your addComment function
+      addComment(
+        firestore,
+        postId,
+        user.uid,
+        commentText,
+        username,
+        userPhotoURL
+      );
     } else {
-      console.log("No user signed in!");
+      // Handle the case where user information is not available yet
+      console.error("User data is not loaded yet");
     }
   };
 
@@ -74,15 +130,14 @@ const Home = () => {
           Post
         </Button>
       </form>
-      <div className="post-container">
+      <div>
         {posts.map((post) => (
           <Post
             key={post.id}
             post={post}
-            onLikePost={(postId) =>
-              handleLikePost(postId, post.likes?.includes(user.uid))
-            }
+            onLikePost={handleLikePost}
             onCommentSubmit={handleCommentSubmit}
+            currentUser={user}
           />
         ))}
       </div>

@@ -7,6 +7,7 @@ import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 // import SignIn from "./SignIn";
 import Home from "./Home";
+// import Profile from "./Profile ";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA2_mqN9xKmjoPLOHxkZ3-L8wmKwbOigq8",
@@ -25,6 +26,9 @@ function App() {
     <div className="App">
       <header className="App-header"></header>
       <Home db={db} />
+      {/* <SignIn db={db} /> */}
+      {/* <Register db={db} /> */}
+      {/* <Profile db={db} /> */}
     </div>
   );
 }

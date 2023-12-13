@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   onSnapshot, // Import onSnapshot to listen to changes in the subcollection
 } from "firebase/firestore";
+import di from "./Colorful Illustrative Young Male Avatar.png";
 
 // Function to submit a new post to Firestore
 export async function submitPost(
@@ -58,18 +59,29 @@ export async function unlikePost(firestore, postId, userId) {
 }
 
 // Function to add a comment to a post and update the comment count using a snapshot
-export function addComment(firestore, postId, userId, text) {
+export function addComment(
+  firestore,
+  postId,
+  userId,
+  text,
+  username,
+  userPhotoURL
+) {
   const postRef = doc(firestore, "posts", postId);
   const commentsCollection = collection(postRef, "comments");
 
-  try {
-    // Add the comment to the comments subcollection
-    addDoc(commentsCollection, {
-      userId: userId,
-      text: text,
-      createdAt: serverTimestamp(),
-    }).then(() => {
-      // Listen to changes in the comments subcollection and update the comment count
+  // Start by adding the comment to the comments subcollection
+  console.log(userId, text, username, userPhotoURL);
+  addDoc(commentsCollection, {
+    userId: userId,
+    text: text,
+    username: username || "Unknown User", // Add the username field
+    userPhotoURL: userPhotoURL || di, // Add the userPhotoURL field
+    createdAt: serverTimestamp(),
+  })
+    .then(() => {
+      // After adding the comment, listen to changes in the comments subcollection
+      // to update the comment count
       onSnapshot(commentsCollection, (snapshot) => {
         const commentCount = snapshot.size;
         updateDoc(postRef, {
@@ -78,8 +90,8 @@ export function addComment(firestore, postId, userId, text) {
           console.error("Error updating comment count: ", error);
         });
       });
+    })
+    .catch((error) => {
+      console.error("Error adding comment: ", error);
     });
-  } catch (error) {
-    console.error("Error adding comment: ", error);
-  }
 }
