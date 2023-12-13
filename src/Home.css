@@ -1,0 +1,152 @@
+.post-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.post {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.post-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-username {
+  font-weight: bold;
+}
+
+.post-timestamp {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.post-content {
+  margin-bottom: 12px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.post-actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.like-button:before {
+  content: "👍";
+  margin-right: 4px;
+}
+.like-button.liked {
+  color: #007bff;
+}
+
+.comment-button:before {
+  content: "💬";
+  margin-right: 4px;
+}
+
+.share-button:before {
+  content: "🔗";
+  margin-right: 4px;
+}
+
+.post-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.like-count {
+  color: #007bff;
+}
+
+.comment-count {
+  color: #007bff;
+}
+.comments-container {
+  margin-top: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.comment-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.comment-username {
+  font-weight: bold;
+  color: #555;
+}
+
+.comment-text {
+  font-size: 0.9rem;
+  color: #333;
+  margin: 4px 0;
+}
+
+.comment-timestamp {
+  font-size: 0.7rem;
+  color: #777;
+}
+@media (max-width: 600px) {
+  .post-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .post-actions button {
+    width: 100%;
+    margin-top: 4px; /* Add space between buttons when stacked */
+  }
+}
+.post-actions button:focus {
+  outline: 2px solid #005fcc; /* Or use a focus-ring utility if available */
+}
+.post-actions button:hover {
+  background-color: #f2f2f2; /* Light grey background on hover */
+}
+.no-comments {
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+}
