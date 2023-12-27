@@ -79,7 +79,7 @@ function ResponsiveAppBar() {
             to="/"
             sx={{
               mr: 2,
-              display: { xs: "none", md: "flex" },
+              display: "block",
               fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",
@@ -90,7 +90,13 @@ function ResponsiveAppBar() {
             Mini Social Media
           </Typography>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "flex", md: "flex" },
+              justifyContent: "flex-end",
+            }}
+          >
             {!currentUser &&
               pages.map((page) => (
                 <Button
