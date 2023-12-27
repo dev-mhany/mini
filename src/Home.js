@@ -5,6 +5,7 @@ import {
   query,
   orderBy,
   onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 import useAuth from "./useAuth";
 import Post from "./Post";
@@ -15,34 +16,39 @@ import di from "./Colorful Illustrative Young Male Avatar.png";
 
 const usePosts = (firestore) => {
   const [posts, setPosts] = useState([]);
-  console.log(di);
+
   useEffect(() => {
     const postsCollectionRef = collection(firestore, "posts");
     const q = query(postsCollectionRef, orderBy("createdAt", "desc"));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const postsData = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const postData = {
+            id: doc.id,
+            ...doc.data(),
+          };
 
-      const updatedPosts = postsData.map((post) => {
-        const commentsRef = collection(firestore, `posts/${post.id}/comments`);
-        const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
-        onSnapshot(commentsQuery, (commentsSnapshot) => {
-          const commentsData = commentsSnapshot.docs.map((commentDoc) => ({
+          const commentsRef = collection(
+            firestore,
+            `posts/${postData.id}/comments`
+          );
+          const commentsQuery = query(
+            commentsRef,
+            orderBy("createdAt", "desc")
+          );
+
+          const commentsSnapshot = await getDocs(commentsQuery);
+          postData.comments = commentsSnapshot.docs.map((commentDoc) => ({
             id: commentDoc.id,
             ...commentDoc.data(),
           }));
-          post.comments = commentsData;
-          setPosts((prevPosts) => {
-            return prevPosts.map((p) => (p.id === post.id ? post : p));
-          });
-        });
-        return post;
-      });
 
-      setPosts(updatedPosts);
+          return postData;
+        })
+      );
+
+      setPosts(postsData);
     });
 
     return () => unsubscribe();
@@ -61,7 +67,7 @@ const Home = () => {
     e.preventDefault();
     if (user) {
       const username = user.displayName || "Anonymous";
-      const userPhotoURL = user.photoURL || di;
+      const userPhotoURL = user.photoURL || di; // This will now be the updated URL from Firebase Storage
       await submitPost(
         firestore,
         user.uid,
@@ -72,6 +78,7 @@ const Home = () => {
       setPostContent("");
     } else {
       console.log("No user signed in!");
+      alert("Please sign in to create a post");
     }
   };
 
@@ -91,7 +98,7 @@ const Home = () => {
     if (user) {
       // Check if the user object is not null
       const username = user.displayName || "Anonymous"; // Fallback to 'Anonymous' if no displayName
-      const userPhotoURL = user.photoURL || di; // Fallback URL if no photoURL
+      const userPhotoURL = user.photoURL || di; // Use the latest profile picture URL from Firebase Authentication
 
       // Now you can pass them to your addComment function
       addComment(

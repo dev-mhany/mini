@@ -6,7 +6,7 @@ import {
   arrayUnion,
   arrayRemove,
   serverTimestamp,
-  onSnapshot, // Import onSnapshot to listen to changes in the subcollection
+  onSnapshot,
 } from "firebase/firestore";
 import di from "./Colorful Illustrative Young Male Avatar.png";
 
