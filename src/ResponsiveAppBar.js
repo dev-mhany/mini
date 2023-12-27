@@ -13,7 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
 const pages = ["SignIn", "Register"];
-const settings = ["Profile", "Account", "Logout"];
+const settings = ["Profile", "Account", "Logout", "GlobalChat"];
 
 function ResponsiveAppBar() {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -53,10 +53,14 @@ function ResponsiveAppBar() {
         navigate("/profile");
         break;
       case "Account":
-        navigate("/account"); // Navigate to the account page
+        navigate("/account");
         break;
       case "Logout":
         handleLogout();
+        break;
+      case "GlobalChat":
+        // Replace 'https://example.com' with the actual external site link
+        window.open("https://superchat-topaz.vercel.app/", "_blank");
         break;
       // ... other cases if any
       default:
